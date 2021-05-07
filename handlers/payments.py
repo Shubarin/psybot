@@ -14,20 +14,17 @@ def precheckout_callback(update, context) -> None:
         user_id = query.from_user.id
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.chat_id == user_id).first()
-        if not user:
-            query.answer(ok=False)
+        price = query.total_amount // 100
+        if not user.is_active:
+            subscription_end = get_subscription_end(price)
+            user.is_active = True
+            user.subscription_start = datetime.datetime.now()
         else:
-            price = query.total_amount // 100
-            if not user.is_active:
-                subscription_end = get_subscription_end(price)
-                user.is_active = True
-                user.subscription_start = datetime.datetime.now()
-            else:
-                subscription_end = get_subscription_end(price,
-                                                        user.subscription_end)
-            user.subscription_end = subscription_end
-            db_sess.commit()
-            query.answer(ok=True)
+            subscription_end = get_subscription_end(price,
+                                                    user.subscription_end)
+        user.subscription_end = subscription_end
+        db_sess.commit()
+        query.answer(ok=True)
 
 
 def successful_payment_callback(update, context) -> None:
