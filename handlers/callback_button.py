@@ -18,7 +18,8 @@ def start_without_shipping_callback(update, context, price) -> None:
     prices = [LabeledPrice('Подписка', price * 100)]
 
     context.bot.send_invoice(
-        chat_id, title, description, payload, provider_token, start_parameter=None, currency=currency, prices=prices
+        chat_id, title, description, payload, provider_token,
+        start_parameter=None, currency=currency, prices=prices
     )
 
 
