@@ -37,7 +37,7 @@ def mailing():
         db_sess.commit()
         logging.info('Сообщения разосланы')
 
-    schedule.every().day.at_time('14:00').do(job)
+    schedule.every().day.at('14:00').do(job)
     while True:
         schedule.run_pending()
         logging.info('Процесс рассылки засыпает')
