@@ -8,7 +8,7 @@ from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, \
 
 from data import db_session
 from handlers import button, help_, myid, start, subscription, \
-    precheckout_callback, successful_payment_callback, unsubscribe
+    precheckout_callback, successful_payment_callback, unsubscribe, mailing
 
 
 def main():
@@ -31,10 +31,13 @@ def main():
 
     main_polling_thread = threading.Thread(target=updater.start_polling)
     unsubsribe_thread = threading.Thread(target=unsubscribe)
+    mailing_thread = threading.Thread(target=mailing)
     main_polling_thread.start()
     unsubsribe_thread.start()
+    mailing_thread.start()
     main_polling_thread.join()
     unsubsribe_thread.join()
+    mailing_thread.join()
     updater.idle()
 
 

@@ -15,12 +15,14 @@ class User(SqlAlchemyBase):
     subscription_start = sqlalchemy.Column(sqlalchemy.Date, nullable=True,
                                            default=sqlalchemy.sql.null())
     subscription_end = sqlalchemy.Column(sqlalchemy.Date, nullable=True,
-                                         default=sqlalchemy.sql.null())
+                                         default=sqlalchemy.sql.null(),
+                                         index=True)
     subscription_duration = sqlalchemy.Column(sqlalchemy.Integer,
                                               nullable=True,
                                               default=sqlalchemy.sql.null())
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
+    count_posts = sqlalchemy.Column(sqlalchemy.Integer, default=1)
 
     def __str__(self):
         return f'User(full_name: {self.full_name}, chat_id: {self.chat_id})'
