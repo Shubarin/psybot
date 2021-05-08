@@ -1,5 +1,6 @@
 import datetime
 import calendar
+import logging
 
 from constants import PRICES
 from data import db_session
@@ -10,21 +11,28 @@ def precheckout_callback(update, context) -> None:
     query = update.pre_checkout_query
     if query.invoice_payload != 'Custom-Payload':
         query.answer(ok=False, error_message="Something went wrong...")
+        return
+    user_id = query.from_user.id
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.chat_id == user_id).first()
+    if not user:
+        query.answer(ok=False,
+                     error_message="Please log in by clicking /start")
+        logging.info('Незарегистрированный пользователь '
+                     f'{query.from_user.id} пытался купить подписку')
+        return
+    price = query.total_amount // 100
+    if not user.is_active:
+        subscription_end = get_subscription_end(price)
+        user.is_active = True
+        user.subscription_start = datetime.datetime.now()
     else:
-        user_id = query.from_user.id
-        db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.chat_id == user_id).first()
-        price = query.total_amount // 100
-        if not user.is_active:
-            subscription_end = get_subscription_end(price)
-            user.is_active = True
-            user.subscription_start = datetime.datetime.now()
-        else:
-            subscription_end = get_subscription_end(price,
-                                                    user.subscription_end)
-        user.subscription_end = subscription_end
-        db_sess.commit()
-        query.answer(ok=True)
+        subscription_end = get_subscription_end(price,
+                                                user.subscription_end)
+    user.subscription_end = subscription_end
+    db_sess.commit()
+    logging.info(f'chat_id: {user_id} оформил подписку')
+    query.answer(ok=True)
 
 
 def successful_payment_callback(update, context) -> None:

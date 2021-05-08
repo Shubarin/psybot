@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 
 from dotenv import load_dotenv
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, \
@@ -7,7 +8,7 @@ from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, \
 
 from data import db_session
 from handlers import button, help_, myid, start, subscription, \
-    precheckout_callback, successful_payment_callback
+    precheckout_callback, successful_payment_callback, unsubscribe
 
 
 def main():
@@ -28,7 +29,12 @@ def main():
     text_handler = MessageHandler(Filters.text, help_)
     dp.add_handler(text_handler)
 
-    updater.start_polling()
+    main_polling_thread = threading.Thread(target=updater.start_polling)
+    unsubsribe_thread = threading.Thread(target=unsubscribe)
+    main_polling_thread.start()
+    unsubsribe_thread.start()
+    main_polling_thread.join()
+    unsubsribe_thread.join()
     updater.idle()
 
 

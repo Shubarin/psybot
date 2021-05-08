@@ -24,3 +24,6 @@ class User(SqlAlchemyBase):
 
     def __str__(self):
         return f'User(full_name: {self.full_name}, chat_id: {self.chat_id})'
+
+    def __repr__(self):
+        return f'User(full_name: {self.full_name}, chat_id: {self.chat_id})'
