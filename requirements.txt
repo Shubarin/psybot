@@ -1,6 +1,6 @@
 alembic==1.6.0
 APScheduler==3.6.3
-certifi==2020.12.5
+certifi==2022.12.7
 greenlet==1.0.0
 importlib-metadata==4.0.1
 Mako==1.1.4
